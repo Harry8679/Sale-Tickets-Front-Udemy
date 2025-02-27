@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe("TA_CLE_PUBLIQUE_STRIPE");
 
 const EventDetails = () => {
-  const { id } = useParams(); // Récupère l'ID de l'événement depuis l'URL
+  const { id } = useParams();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const [sessionUrl, setSessionUrl] = useState("");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -22,6 +28,20 @@ const EventDetails = () => {
     fetchEvent();
   }, [id]);
 
+  const handleCheckout = async () => {
+    try {
+      const { data } = await api.post("/checkout", {
+        eventId: id,
+        quantity,
+      });
+
+      setSessionUrl(data.url);
+      window.location.href = data.url; // Redirection vers Stripe Checkout
+    } catch (error) {
+      console.error("Erreur lors de la création de la session de paiement :", error);
+    }
+  };
+
   if (loading) return <p>Chargement...</p>;
   if (!event) return <p>Événement introuvable.</p>;
 
@@ -32,6 +52,25 @@ const EventDetails = () => {
       <p><strong>Lieu :</strong> {event.location}</p>
       <p><strong>Prix :</strong> {event.price} €</p>
       <p><strong>Places disponibles :</strong> {event.availableTickets}</p>
+
+      <div className="mt-4">
+        <label>Nombre de billets :</label>
+        <input
+          type="number"
+          min="1"
+          max={event.availableTickets}
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          className="border p-2"
+        />
+      </div>
+
+      <button
+        onClick={handleCheckout}
+        className="bg-blue-500 text-white p-2 mt-4"
+      >
+        Payer avec Stripe
+      </button>
     </div>
   );
 };

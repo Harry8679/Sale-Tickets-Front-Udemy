@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import api from "../services/api";
 import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe("TA_CLE_PUBLIQUE_STRIPE");
+const stripePromise = loadStripe(process.env.REACT_APP_PUBLIC_KEY);
 
 const EventDetails = () => {
   const { id } = useParams();

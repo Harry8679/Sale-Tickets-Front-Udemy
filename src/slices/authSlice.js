@@ -1,9 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// ✅ État initial de l'authentification
+// ✅ Vérifie si "user" est défini avant d'essayer de le parser
+const getUserFromLocalStorage = () => {
+  const storedUser = localStorage.getItem("user");
+  return storedUser ? JSON.parse(storedUser) : null;
+};
+
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null, // Récupère l'utilisateur s'il est stocké en local
-  token: localStorage.getItem("token") || null, // Récupère le token s'il est stocké
+  user: getUserFromLocalStorage(),
+  token: localStorage.getItem("token") || null,
 };
 
 // ✅ Création du slice Redux pour l'auth
@@ -11,15 +16,16 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // 📌 Action pour définir l'utilisateur
+    // 📌 Action pour définir l'utilisateur après inscription/connexion
     setUser: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", action.payload.token);
+      const { user, token } = action.payload;
+      state.user = user;
+      state.token = token;
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
     },
 
-    // 📌 Action pour déconnecter l'utilisateur
+    // 📌 Déconnexion
     logout: (state) => {
       state.user = null;
       state.token = null;
@@ -29,8 +35,6 @@ const authSlice = createSlice({
   },
 });
 
-// ✅ Export des actions
+// ✅ Export des actions et du reducer
 export const { setUser, logout } = authSlice.actions;
-
-// ✅ Export du reducer
 export default authSlice.reducer;

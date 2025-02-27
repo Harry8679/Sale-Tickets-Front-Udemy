@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 
 const stripePromise = loadStripe("TA_CLE_PUBLIQUE_STRIPE");
 
@@ -11,7 +10,6 @@ const EventDetails = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [sessionUrl, setSessionUrl] = useState("");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -30,46 +28,41 @@ const EventDetails = () => {
 
   const handleCheckout = async () => {
     try {
-      const { data } = await api.post("/checkout", {
-        eventId: id,
-        quantity,
-      });
-
-      setSessionUrl(data.url);
-      window.location.href = data.url; // Redirection vers Stripe Checkout
+      const { data } = await api.post("/checkout", { eventId: id, quantity });
+      window.location.href = data.url; // Redirige vers Stripe Checkout
     } catch (error) {
       console.error("Erreur lors de la création de la session de paiement :", error);
     }
   };
 
-  if (loading) return <p>Chargement...</p>;
-  if (!event) return <p>Événement introuvable.</p>;
+  if (loading) return <p className="text-center text-lg">Chargement...</p>;
+  if (!event) return <p className="text-center text-red-500 text-lg">Événement introuvable.</p>;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold mb-4">{event.name}</h2>
-      <p><strong>Date :</strong> {new Date(event.date).toLocaleDateString()}</p>
-      <p><strong>Lieu :</strong> {event.location}</p>
-      <p><strong>Prix :</strong> {event.price} €</p>
-      <p><strong>Places disponibles :</strong> {event.availableTickets}</p>
+    <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+      <h2 className="text-3xl font-bold text-gray-800 mb-4">{event.name}</h2>
+      <p className="text-gray-600 text-lg mb-2">📍 {event.location}</p>
+      <p className="text-gray-600 text-lg mb-2">📅 {new Date(event.date).toLocaleDateString()}</p>
+      <p className="text-gray-600 text-lg mb-2">💰 {event.price} €</p>
+      <p className="text-gray-600 text-lg mb-4">🎟️ {event.availableTickets} places disponibles</p>
 
-      <div className="mt-4">
-        <label>Nombre de billets :</label>
+      <div className="flex items-center mb-4">
+        <label className="mr-2 text-lg font-semibold">Nombre de billets :</label>
         <input
           type="number"
           min="1"
           max={event.availableTickets}
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
-          className="border p-2"
+          className="border p-2 w-20 text-center"
         />
       </div>
 
       <button
         onClick={handleCheckout}
-        className="bg-blue-500 text-white p-2 mt-4"
+        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-300"
       >
-        Payer avec Stripe
+        🎟️ Réserver maintenant
       </button>
     </div>
   );

@@ -28,7 +28,7 @@ const EventDetails = () => {
 
   const handleCheckout = async () => {
     try {
-      const { data } = await api.post("/checkout", { eventId: id, quantity });
+      const { data } = await api.post("/checkout", { eventId: id, quantity, userId: user._id });
       window.location.href = data.url; // Redirige vers Stripe Checkout
     } catch (error) {
       console.error("Erreur lors de la création de la session de paiement :", error);

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
 import { loadStripe } from "@stripe/stripe-js";
+import { useSelector } from "react-redux";
+
 
 const stripePromise = loadStripe(process.env.REACT_APP_PUBLIC_KEY);
 
@@ -10,6 +12,8 @@ const EventDetails = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const fetchEvent = async () => {

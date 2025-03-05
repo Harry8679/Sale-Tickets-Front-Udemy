@@ -22,9 +22,25 @@ const Profile = () => {
         }
       }
     };
-
+  
     fetchReservations();
-  }, [user]);
+  }, [user, window.location.search]); // Déclenche la mise à jour après paiement
+  
+
+  // useEffect(() => {
+  //   const fetchReservations = async () => {
+  //     if (user) {
+  //       try {
+  //         const { data } = await api.get("/reservations/mine");
+  //         setReservations(data);
+  //       } catch (error) {
+  //         console.error("Erreur lors de la récupération des réservations :", error);
+  //       }
+  //     }
+  //   };
+
+  //   fetchReservations();
+  // }, [user]);
 
   const handleLogout = () => {
     dispatch(logout());

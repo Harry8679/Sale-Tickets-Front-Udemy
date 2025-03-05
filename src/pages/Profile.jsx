@@ -12,16 +12,29 @@ const Profile = () => {
   const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
+    // const fetchReservations = async () => {
+    //   if (user) {
+    //     try {
+    //       const { data } = await api.get("/reservations/mine");
+    //       setReservations(data);
+    //     } catch (error) {
+    //       console.error("Erreur lors de la récupération des réservations :", error);
+    //     }
+    //   }
+    // };
     const fetchReservations = async () => {
       if (user) {
         try {
+          console.log("🔍 Envoi de la requête pour récupérer les réservations...");
           const { data } = await api.get("/reservations/mine");
+          console.log("✅ Réservations reçues :", data);
           setReservations(data);
         } catch (error) {
-          console.error("Erreur lors de la récupération des réservations :", error);
+          console.error("❌ Erreur lors de la récupération des réservations :", error.response ? error.response.data : error);
         }
       }
     };
+    
   
     fetchReservations();
   }, [user, window.location.search]); // Déclenche la mise à jour après paiement
